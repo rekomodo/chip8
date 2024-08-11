@@ -10,6 +10,17 @@ pub fn get_nibbles(instr : u16) -> [u16;4] {
     ]
 }
 
+pub fn join_nibbles(nibbles : &[u16]) -> u16 {
+    let mut res = nibbles[0];
+
+    for nibble in &nibbles[1..]{
+        res <<= 4;
+        res += nibble;
+    }
+
+    res
+}
+
 pub fn get_program_bytes(path: &str) -> Result<Vec<u8>, std::io::Error> {
     let file = File::open(path).unwrap();
     return file.bytes().collect()
@@ -22,6 +33,10 @@ mod tests {
     #[test]
     fn test_get_nibbles(){
         assert_eq!([0x1, 0xE, 0xF, 0xB], get_nibbles(0x1EFB));
+    }
+
+    fn test_join_nibbles(){
+        assert_eq!(0x1EFB, join_nibbles(&[0x1, 0xE, 0xF, 0xB]));
     }
 
     #[test]
