@@ -57,8 +57,8 @@ fn main() {
             0x6 => registers[x] = nn, // 0x6XNN : set register VX to NN
             0x7 => registers[x] += nn, // 0x7XNN : add NN to register VX
             0xA => index_register = nnn, // 0xANNN : set index register I to NNN
-            0xD => (), // 0xDXYN : display/draw
-            _ => panic!("Could not match instruction {instr:#06X}.")
+            0xD => (), // 0xDXYN : display/draw,
+            _ => ()
         }
 
         stack.push(pc);
