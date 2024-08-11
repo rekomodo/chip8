@@ -35,6 +35,7 @@ mod tests {
         assert_eq!([0x1, 0xE, 0xF, 0xB], get_nibbles(0x1EFB));
     }
 
+    #[test]
     fn test_join_nibbles(){
         assert_eq!(0x1EFB, join_nibbles(&[0x1, 0xE, 0xF, 0xB]));
     }
@@ -43,6 +44,6 @@ mod tests {
     fn test_get_program_bytes(){
         let bytes = get_program_bytes("./roms/ibm_logo.ch8").unwrap();
 
-        assert_eq!(bytes[1], 0xEF);
+        assert_eq!(bytes[1], 0xE0);
     }
 }

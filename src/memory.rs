@@ -24,7 +24,7 @@ const MEMORY_SIZE: usize = 4096;
 const FONTS_START: usize = 0x050;
 
 pub struct Memory {
-    data : [u8; MEMORY_SIZE]
+    pub data : [u8; MEMORY_SIZE]
 }
 
 impl Memory {
