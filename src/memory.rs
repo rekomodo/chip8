@@ -1,4 +1,4 @@
-const FONT_HEIGHT: usize = 5;
+pub const FONT_HEIGHT: usize = 5;
 const FONT_COUNT: usize = 16;
 
 const FONTS: [u8; FONT_HEIGHT * FONT_COUNT] = [
@@ -21,7 +21,7 @@ const FONTS: [u8; FONT_HEIGHT * FONT_COUNT] = [
 ];
 
 const MEMORY_SIZE: usize = 4096;
-const FONTS_START: usize = 0x050;
+pub const FONTS_START: usize = 0x050;
 
 pub struct Memory {
     pub data : [u8; MEMORY_SIZE]
