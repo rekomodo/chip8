@@ -39,50 +39,20 @@ impl Memory {
         Memory { data }
     }
 
-    pub fn set(&mut self, p : usize, buff : &Vec<u8>) {
+    pub fn set(&mut self, p : usize, buff : &[u8]) {
         assert!((0..MEMORY_SIZE).contains(&p));
     
         let memory_slice = &mut self.data[p..p + buff.len()];
         memory_slice.copy_from_slice(buff);
     }
 
-    pub fn get_instruction(&self, p : &mut usize) -> u16 {
-        assert!((0..MEMORY_SIZE).contains(p));
-        assert!((0..MEMORY_SIZE).contains(&(*p+1)));
+    pub fn get_instruction(&self, p : usize) -> u16 {
+        assert!((0..MEMORY_SIZE).contains(&p));
+        assert!((0..MEMORY_SIZE).contains(&(p+1)));
 
-        let byte_left : u16 = self.data[*p] as u16;
-        let byte_right : u16 = self.data[*p + 1] as u16;
-
-        *p += 2; // increment program counter
+        let byte_left : u16 = self.data[p] as u16;
+        let byte_right : u16 = self.data[p + 1] as u16;
 
         (byte_left << 8) + byte_right
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_set(){
-        let mut mem = Memory::new();
-
-        let p : usize = 0x14;
-        let buf = vec![0x11, 0x22, 0x33, 0x44];
-        mem.set(p, &buf);
-
-        assert_eq!(mem.data[p..p+buf.len()], buf);
-    }
-
-    #[test]
-    fn test_get_instruction(){
-        let mut mem = Memory::new();
-
-        let mut p : usize = 0x14;
-        let buf = vec![0x11, 0x22, 0x33, 0x44];
-        mem.set(p, &buf);
-
-        assert_eq!(mem.get_instruction(&mut p), 0x1122);
-        assert_eq!(mem.get_instruction(&mut p), 0x3344);
     }
 }

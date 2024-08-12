@@ -1,10 +1,11 @@
 use minifb::{Key, Window, WindowOptions};
 
 const DISPLAY_SCALE: usize = 10;
+const COLOR_ON: u32 = 0x00FFFFFF;
+const COLOR_OFF: u32 = 0x00000000;
 
 pub struct Display {
     window: Window,
-    buffer: Vec<u32>,
     width: usize,
     height: usize,
 }
@@ -23,16 +24,15 @@ impl Display {
 
         Display {
             window,
-            buffer: vec![0u32; width * height],
             width: width,
             height: height,
         }
     }
 
-    pub fn update_display(&mut self) {
+    pub fn update_display(&mut self, buffer : &[u32]) {
         let mut buffer_lines = vec![];
-        for b in self.buffer.iter() {
-            buffer_lines.extend((0..DISPLAY_SCALE).map(|_| if *b > 0 { 0xFFFFFFFF } else { 0u32 }))
+        for b in buffer.iter() {
+            buffer_lines.extend((0..DISPLAY_SCALE).map(|_| if *b > 0 { COLOR_ON } else { COLOR_OFF }))
         }
 
         let mut buffer = vec![];
@@ -50,17 +50,5 @@ impl Display {
                 self.height * DISPLAY_SCALE,
             )
             .unwrap();
-    }
-
-    pub fn xor_pixel(&mut self, row: usize, col: usize, val: u32) {
-        assert!((0..self.width).contains(&col));
-        assert!((0..self.height).contains(&row));
-
-        let idx = row * self.width + col;
-        self.buffer[idx] ^= val;
-    }
-
-    pub fn clear(&mut self) {
-        self.buffer.fill(0u32);
     }
 }
