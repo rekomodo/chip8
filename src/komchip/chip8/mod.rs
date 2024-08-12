@@ -38,9 +38,13 @@ impl Interpreter {
         }
     }
 
-    pub fn tick_timers(&mut self){
-        if self.delay_timer > 0 {self.delay_timer -= 1};
-        if self.sound_timer > 0 {self.sound_timer -= 1};
+    pub fn tick_timers(&mut self) {
+        if self.delay_timer > 0 {
+            self.delay_timer -= 1
+        };
+        if self.sound_timer > 0 {
+            self.sound_timer -= 1
+        };
     }
 
     pub fn load_rom(&mut self, bytes: &[u8]) {
@@ -170,7 +174,7 @@ impl Interpreter {
             0xF => match nn {
                 0x07 => self.registers[x] = self.delay_timer,
                 0x15 => self.delay_timer = self.registers[x],
-                0x18 => self.sound_timer = self.registers[x],           
+                0x18 => self.sound_timer = self.registers[x],
                 0x1E => {
                     let overflow;
                     (self.index_register, overflow) = self.index_register.overflowing_add(x);
@@ -188,7 +192,7 @@ impl Interpreter {
                     while num > 0 {
                         digits.push(num % 10);
                         num /= 10;
-                    }   
+                    }
                     digits.reverse();
 
                     self.ram.set(self.index_register, &digits);
@@ -199,7 +203,7 @@ impl Interpreter {
                     }
                 }
                 0x65 => {
-                    for i   in 0..=x {
+                    for i in 0..=x {
                         self.registers[i] = self.ram.data[self.index_register + i];
                     }
                 }
