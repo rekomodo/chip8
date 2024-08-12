@@ -59,7 +59,7 @@ impl Interpreter {
         let nibbles = nibbles::get_nibbles(instr);
         let nnn = nibbles::join_nibbles(&nibbles[1..4]);
 
-        let x: usize = nibbles[1] as usize;
+        let x = nibbles[1] as usize;
         let nn = nibbles::join_nibbles(&nibbles[2..4]) as u8;
 
         let y = nibbles[2] as usize;
@@ -148,7 +148,7 @@ impl Interpreter {
             0xD => {
                 self.display_flag = true;
 
-                let row = self.registers[y as usize] as usize % DISPLAY_HEIGHT;
+                let row = self.registers[y] as usize % DISPLAY_HEIGHT;
                 let col = self.registers[x] as usize % DISPLAY_WIDTH;
                 self.registers[0xF as usize] = 0;
 
