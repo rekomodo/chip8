@@ -8,7 +8,7 @@ pub const DISPLAY_WIDTH: usize = 64;
 const REGISTER_COUNT: usize = 16;
 
 pub struct Interpreter {
-    ram: memory::Memory,
+    pub ram: memory::Memory,
     pub display_buffer: [u64; DISPLAY_HEIGHT],
     index_register: usize,
     delay_timer: u8,

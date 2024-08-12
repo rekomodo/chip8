@@ -48,7 +48,9 @@ fn main() {
         instructions_since_tick = (instructions_since_tick + 1) % IPT;
         sleep(Duration::from_secs_f64(1f64 / IPS as f64));
     }
-}
+
+    std::fs::write("debug/memory_dump.txt", format!("{:#06x?}", interpreter.ram.data)).unwrap();
+}                               
 
 // TODO: make into iterator with ReadBuffer for memory reasons
 fn get_rom_bytes(path: &str) -> Result<Vec<u8>, std::io::Error> {
