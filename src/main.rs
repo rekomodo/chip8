@@ -5,7 +5,7 @@ mod reader;
 use core::panic;
 use display::Display;
 use memory::*;
-use rand::{prelude::*, seq::index};
+use rand::prelude::*;
 use std::env;
 
 const PROGRAM_START: usize = 0x200;
@@ -194,10 +194,10 @@ fn main() {
                     for i in 0..x {
                         mem.data[index_register + i] = registers[i];
                     }
-                },
+                }
                 0x65 => {
                     for i in 0..x {
-                        registers[i] = mem.data[index_register + i] ;
+                        registers[i] = mem.data[index_register + i];
                     }
                 }
                 _ => panic!("No match on ??={nn:#04x} for 0xFX?? opcode."),
