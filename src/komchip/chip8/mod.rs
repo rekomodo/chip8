@@ -106,33 +106,33 @@ impl Interpreter {
                         let (new_v, overflow) =
                             self.registers[x].overflowing_add(self.registers[y]);
                         self.registers[x] = new_v;
-                        self.registers[0xF as usize] = overflow as u8;
+                        self.registers[0xF] = overflow as u8;
                     }
                     5 => {
                         let (new_v, underflow) =
                             self.registers[x].overflowing_sub(self.registers[y]);
                         self.registers[x] = new_v;
-                        self.registers[0xF as usize] = (!underflow) as u8;
+                        self.registers[0xF] = (!underflow) as u8;
                     }
                     6 => {
                         // self.registers[x] = self.registers[y]; // TODO: OPTIONAL, MAKE INTO CFG
                         let shift_out = self.registers[x] & 0x1;
                         self.registers[x] >>= 1;
 
-                        self.registers[0xF as usize] = shift_out;
+                        self.registers[0xF] = shift_out;
                     }
                     7 => {
                         let (new_v, underflow) =
                             self.registers[y].overflowing_sub(self.registers[x]);
                         self.registers[x] = new_v;
-                        self.registers[0xF as usize] = (!underflow) as u8;
+                        self.registers[0xF] = (!underflow) as u8;
                     }
                     0xE => {
                         // self.registers[x] = self.registers[y]; // TODO: OPTIONAL, MAKE INTO CFG
                         let shift_out = self.registers[x] & 0b10000000;
                         self.registers[x] <<= 1;
 
-                        self.registers[0xF as usize] = shift_out;
+                        self.registers[0xF] = shift_out;
                     }
                     _ => panic!("No match on ?={n:#03x} for 0x8XY? opcode."),
                 }
@@ -155,6 +155,12 @@ impl Interpreter {
                 for i in 0..n as usize {
                     let sprite_bits = self.ram.data[self.index_register + i].reverse_bits();
                     let aligned_sprite_bits = (sprite_bits as u64) << col;
+
+                    // check for overwrite
+                    if self.display_buffer[row + i] & aligned_sprite_bits > 0 {
+                        self.registers[0xF] = 1;
+                    }
+
                     self.display_buffer[row + i] ^= aligned_sprite_bits;
                 }
             }
@@ -164,7 +170,7 @@ impl Interpreter {
             0xF => match nn {
                 0x07 => self.registers[x] = self.delay_timer,
                 0x15 => self.delay_timer = self.registers[x],
-                0x18 => self.sound_timer = self.registers[x],
+                0x18 => self.sound_timer = self.registers[x],           
                 0x1E => {
                     let overflow;
                     (self.index_register, overflow) = self.index_register.overflowing_add(x);
@@ -182,19 +188,18 @@ impl Interpreter {
                     while num > 0 {
                         digits.push(num % 10);
                         num /= 10;
-                    }
+                    }   
                     digits.reverse();
 
-                    self.ram.data[self.index_register..self.index_register + digits.len()]
-                        .copy_from_slice(&digits);
+                    self.ram.set(self.index_register, &digits);
                 }
                 0x55 => {
-                    for i in 0..x {
+                    for i in 0..=x {
                         self.ram.data[self.index_register + i] = self.registers[i];
                     }
                 }
                 0x65 => {
-                    for i in 0..x {
+                    for i   in 0..=x {
                         self.registers[i] = self.ram.data[self.index_register + i];
                     }
                 }
