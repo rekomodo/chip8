@@ -28,6 +28,7 @@ fn main() {
 
         if interpreter.display_flag {
             display.update_display(&buffer);
+            interpreter.display_flag = false;
         }
     }
 }
