@@ -4,10 +4,37 @@ const DISPLAY_SCALE: usize = 10;
 const COLOR_ON: u32 = 0x00FFFFFF;
 const COLOR_OFF: u32 = 0x00000000;
 
+const KEYBOARD: [Key; 16] = [
+    Key::X,
+
+    Key::Key1,
+    Key::Key2,
+    Key::Key3,
+
+    Key::Q,
+    Key::W,
+    Key::E,
+    
+    Key::A,
+    Key::S,
+    Key::D,
+
+    //bottom row without 0
+    Key::Z,
+    Key::C,
+
+    //right column
+    Key::Key4,
+    Key::R,
+    Key::F,
+    Key::V
+];
+
 pub struct Display {
     window: Window,
     width: usize,
     height: usize,
+    pub exit: bool,
 }
 
 impl Display {
@@ -26,7 +53,16 @@ impl Display {
             window,
             width: width,
             height: height,
+            exit: false
         }
+    }
+
+    pub fn get_inputs(&mut self) -> u16 {
+        self.window.update();
+
+        self.exit |= self.window.is_key_down(Key::Escape);
+
+        0b0000000000000000
     }
 
     pub fn update_display(&mut self, buffer : &[u32]) {

@@ -2,7 +2,11 @@ mod display;
 
 use display::Display;
 use komchip::*;
-use std::{env, fs::File, io::Read};
+use std::{env, fs::File, io::Read, thread::sleep, time::Duration};
+
+const TPS: u32 = 60; // used for delay_timer, sound_timer
+const IPT: u32 = 12;
+const IPS: u32 = TPS * IPT;
 
 fn main() {
     println!("CHIP8 Interpreter by @rekomodo");
@@ -16,7 +20,9 @@ fn main() {
 
     let mut display = Display::new(chip8::DISPLAY_WIDTH, chip8::DISPLAY_HEIGHT);
 
+    let mut instructions_since_tick = 0;
     loop {
+        interpreter.keyboard = display.get_inputs();
         interpreter.step();
 
         let mut buffer = vec![];
@@ -30,9 +36,21 @@ fn main() {
             display.update_display(&buffer);
             interpreter.display_flag = false;
         }
+
+        if instructions_since_tick == 0 {
+            interpreter.tick_timers();
+        }
+
+        if display.exit {
+            break;
+        }
+
+        instructions_since_tick = (instructions_since_tick + 1) % IPT;
+        sleep(Duration::from_secs_f64(1f64 / IPS as f64));
     }
 }
 
+// TODO: make into iterator with ReadBuffer for memory reasons
 fn get_rom_bytes(path: &str) -> Result<Vec<u8>, std::io::Error> {
     let file = File::open(path).unwrap();
     return file.bytes().collect();

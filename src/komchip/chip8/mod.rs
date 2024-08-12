@@ -15,7 +15,8 @@ pub struct Interpreter {
     sound_timer: u8,
     registers: [u8; REGISTER_COUNT],
     pub display_flag: bool,
-    rng: ThreadRng,
+    pub keyboard: u16,
+    rng: StdRng,
 
     stack: Box<Vec<usize>>, // TODO: make fixed size stack
 }
@@ -30,10 +31,16 @@ impl Interpreter {
             sound_timer: 0,
             registers: [0; REGISTER_COUNT],
             display_flag: false,
-            rng: rand::thread_rng(), // TODO: allow seeding
+            rng: StdRng::from_entropy(), // TODO: allow seeding
+            keyboard: 0,
 
             stack: Box::new(vec![PROGRAM_START]),
         }
+    }
+
+    pub fn tick_timers(&mut self){
+        if self.delay_timer > 0 {self.delay_timer -= 1};
+        if self.sound_timer > 0 {self.sound_timer -= 1};
     }
 
     pub fn load_rom(&mut self, bytes: &[u8]) {
