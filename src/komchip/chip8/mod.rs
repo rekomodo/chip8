@@ -188,11 +188,13 @@ impl Interpreter {
                 0x33 => {
                     let mut num = self.registers[x];
 
-                    let mut digits = vec![];
-                    while num > 0 {
-                        digits.push(num % 10);
+                    let mut digits = [0; 3];
+
+                    for i in 0..3{
+                        digits[i] = num % 10;
                         num /= 10;
                     }
+
                     digits.reverse();
 
                     self.ram.set(self.index_register, &digits);
