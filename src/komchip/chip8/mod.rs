@@ -209,7 +209,7 @@ impl Interpreter {
                 }
                 _ => panic!("No match on ??={nn:#04x} for 0xFX?? instruction."),
             },
-            _ => (),
+            _ => panic!("No instructions match {instr:#06x}"),
         }
 
         self.stack.push(pc); // push to stack after modifiers
