@@ -57,6 +57,8 @@ impl Interpreter {
     }
 
     pub fn process_instruction(&mut self, instr: u16) {
+        println!("{instr:#06x}");
+        
         let mut pc = *self.stack.last().unwrap() + 2;
         self.stack.pop();
 
@@ -169,7 +171,17 @@ impl Interpreter {
                 }
             }
             0xE => match nn {
-                _ => todo!("Instruction 0xEXNN not implemented! Waiting on keyboard impl."),
+                0x9E => {
+                    if self.keyboard >> self.registers[x] & 1 > 0 {
+                        pc += 2;
+                    }
+                },
+                0xA1 => {
+                    if self.keyboard >> self.registers[x] & 1 == 0 {
+                        pc += 2;
+                    }
+                }
+                _ => panic!("No match on ??={nn:#04x} for 0xEX?? instruction."),
             },
             0xF => match nn {
                 0x07 => self.registers[x] = self.delay_timer,
@@ -180,7 +192,14 @@ impl Interpreter {
                     (self.index_register, overflow) = self.index_register.overflowing_add(x);
                     self.registers[0xF] = overflow as u8;
                 }
-                0x0A => todo!("Instruction FX0A not implemented! Waiting on keyboard impl."),
+                0x0A => {
+                    let first_key = self.keyboard.leading_zeros();
+                    if first_key <= 0xF {
+                        self.registers[x] = first_key as u8;
+                    } else {
+                        pc -= 2; // repeat this instruction
+                    }
+                },
                 0x29 => {
                     self.index_register =
                         memory::FONTS_START + self.registers[x] as usize * memory::FONT_HEIGHT
