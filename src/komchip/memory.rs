@@ -41,6 +41,7 @@ impl Memory {
 
     pub fn set(&mut self, p : usize, buff : &[u8]) {
         assert!((0..MEMORY_SIZE).contains(&p));
+        assert!((0..MEMORY_SIZE).contains(&(p + buff.len() - 1)));
     
         let memory_slice = &mut self.data[p..p + buff.len()];
         memory_slice.copy_from_slice(buff);

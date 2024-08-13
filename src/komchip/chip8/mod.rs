@@ -58,7 +58,7 @@ impl Interpreter {
 
     pub fn process_instruction(&mut self, instr: u16) {
         println!("{instr:#06x}");
-        
+
         let mut pc = *self.stack.last().unwrap() + 2;
         self.stack.pop();
 
@@ -135,7 +135,7 @@ impl Interpreter {
                     }
                     0xE => {
                         // self.registers[x] = self.registers[y]; // TODO: OPTIONAL, MAKE INTO CFG
-                        let shift_out = self.registers[x] & 0b10000000;
+                        let shift_out = (self.registers[x] & 0b10000000) >> 7;
                         self.registers[x] <<= 1;
 
                         self.registers[0xF] = shift_out;
@@ -159,15 +159,20 @@ impl Interpreter {
                 self.registers[0xF as usize] = 0;
 
                 for i in 0..n as usize {
+                    let y = row + i;
+                    if y >= DISPLAY_HEIGHT {
+                        break;
+                    }
+
                     let sprite_bits = self.ram.data[self.index_register + i].reverse_bits();
                     let aligned_sprite_bits = (sprite_bits as u64) << col;
 
                     // check for overwrite
-                    if self.display_buffer[row + i] & aligned_sprite_bits > 0 {
+                    if self.display_buffer[y] & aligned_sprite_bits > 0 {
                         self.registers[0xF] = 1;
                     }
 
-                    self.display_buffer[row + i] ^= aligned_sprite_bits;
+                    self.display_buffer[y] ^= aligned_sprite_bits;
                 }
             }
             0xE => match nn {
@@ -175,7 +180,7 @@ impl Interpreter {
                     if self.keyboard >> self.registers[x] & 1 > 0 {
                         pc += 2;
                     }
-                },
+                }
                 0xA1 => {
                     if self.keyboard >> self.registers[x] & 1 == 0 {
                         pc += 2;
@@ -199,17 +204,17 @@ impl Interpreter {
                     } else {
                         pc -= 2; // repeat this instruction
                     }
-                },
+                }
                 0x29 => {
                     self.index_register =
                         memory::FONTS_START + self.registers[x] as usize * memory::FONT_HEIGHT
                 }
                 0x33 => {
                     let mut num = self.registers[x];
-
+                    
                     let mut digits = [0; 3];
 
-                    for i in 0..3{
+                    for i in 0..3 {
                         digits[i] = num % 10;
                         num /= 10;
                     }
@@ -218,15 +223,10 @@ impl Interpreter {
 
                     self.ram.set(self.index_register, &digits);
                 }
-                0x55 => {
-                    for i in 0..=x {
-                        self.ram.data[self.index_register + i] = self.registers[i];
-                    }
-                }
+                0x55 => self.ram.set(self.index_register, &self.registers[0..=x]),
                 0x65 => {
-                    for i in 0..=x {
-                        self.registers[i] = self.ram.data[self.index_register + i];
-                    }
+                    let ram_slice = &self.ram.data[self.index_register..=self.index_register + x];
+                    self.registers[0..=x].copy_from_slice(ram_slice);
                 }
                 _ => panic!("No match on ??={nn:#04x} for 0xFX?? instruction."),
             },
