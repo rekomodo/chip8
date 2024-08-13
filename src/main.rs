@@ -25,14 +25,14 @@ fn main() {
         interpreter.keyboard = display.get_inputs();
         interpreter.step();
 
-        let mut buffer = vec![];
-        for buffer_line in interpreter.display_buffer {
-            for j in 0..chip8::DISPLAY_WIDTH {
-                buffer.push((buffer_line >> j & 1 > 0) as u32);
-            }
-        }
-
         if interpreter.display_flag {
+            let mut buffer = vec![];
+            for buffer_line in interpreter.display_buffer {
+                for j in 0..chip8::DISPLAY_WIDTH {
+                    buffer.push((buffer_line >> j & 1 > 0) as u32);
+                }
+            }
+            
             display.update_display(&buffer);
             interpreter.display_flag = false;
         }
