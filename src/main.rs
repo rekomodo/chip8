@@ -37,15 +37,15 @@ fn main() {
             interpreter.display_flag = false;
         }
 
-        if instructions_since_tick == 0 {
-            interpreter.tick_timers();
-        }
-
         if display.exit {
             break;
         }
 
         instructions_since_tick = (instructions_since_tick + 1) % IPT;
+        if instructions_since_tick == 0 {
+            interpreter.tick_timers();
+        }
+
         sleep(Duration::from_secs_f64(1f64 / IPS as f64));
     }
 
