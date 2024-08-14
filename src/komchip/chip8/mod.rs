@@ -1,3 +1,5 @@
+use core::panic;
+
 use crate::memory;
 use crate::nibbles;
 use rand::prelude::*; // TODO: Clean imports.
@@ -57,8 +59,6 @@ impl Interpreter {
     }
 
     pub fn process_instruction(&mut self, instr: u16) {
-        println!("{instr:#06x}");
-
         let mut pc = *self.stack.last().unwrap() + 2;
         self.stack.pop();
 
@@ -177,12 +177,12 @@ impl Interpreter {
             }
             0xE => match nn {
                 0x9E => {
-                    if self.keyboard >> self.registers[x] & 1 > 0 {
+                    if (self.keyboard >> self.registers[x]) & 1 > 0 {
                         pc += 2;
                     }
                 }
                 0xA1 => {
-                    if self.keyboard >> self.registers[x] & 1 == 0 {
+                    if (self.keyboard >> self.registers[x]) & 1 == 0 {
                         pc += 2;
                     }
                 }
@@ -211,7 +211,7 @@ impl Interpreter {
                 }
                 0x33 => {
                     let mut num = self.registers[x];
-                    
+
                     let mut digits = [0; 3];
 
                     for i in 0..3 {
